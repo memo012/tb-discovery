@@ -2,6 +2,7 @@ package registry
 
 import (
 	"fmt"
+	"github.com/memo012/tb-discovery/conf"
 	"github.com/memo012/tb-discovery/constant/errors"
 	"github.com/memo012/tb-discovery/model"
 	"sync"
@@ -17,6 +18,15 @@ type Registry struct {
 func (r *Registry) newApp(ins *model.Instance) (a *model.App) {
 	as, _ := r.newapps(ins.AppID, ins.Env)
 	a, _ = as.NewApp(ins.Zone, ins.AppID, ins.LatestTimestamp)
+	return
+}
+
+// NewRegistry new register.
+func NewRegistry(conf *conf.Config) (r *Registry) {
+	r = &Registry{
+		appm: make(map[string]*model.Apps),
+		gd:   new(Guard),
+	}
 	return
 }
 

@@ -1,8 +1,10 @@
 package model
 
 import (
+	"encoding/json"
 	"github.com/memo012/tb-discovery/constant/errors"
 	"sync"
+	"time"
 )
 
 type Instance struct {
@@ -30,6 +32,25 @@ func NewApps() *Apps {
 	return &Apps{
 		apps: make(map[string]*App),
 	}
+}
+
+// NewInstance new a instance.
+func NewInstance(arg *ArgRegister) (i *Instance) {
+	now := time.Now().UnixNano()
+	i = &Instance{
+		Zone:            arg.Zone,
+		Env:             arg.Env,
+		AppID:           arg.AppID,
+		RegTimestamp:    now,
+		UpTimestamp:     now,
+		LatestTimestamp: now,
+	}
+	if arg.Metadata != "" {
+		if err := json.Unmarshal([]byte(arg.Metadata), &i.Metadata); err != nil {
+			log.Error("json unmarshal metadata err %v", err)
+		}
+	}
+	return
 }
 
 type App struct {
