@@ -12,7 +12,6 @@ type Registry struct {
 	appm  map[string]*model.Apps // appid-env -> apps    获取instance  那一台机器
 	gd    *Guard                 // 设置过期时间
 	aLock sync.RWMutex
-	a     model.App
 }
 
 func (r *Registry) newApp(ins *model.Instance) (a *model.App) {
@@ -37,7 +36,7 @@ func (r *Registry) newapps(appid, env string) (a *model.Apps, ok bool) {
 		a = model.NewApps()
 		r.appm[key] = a
 	}
-	r.aLock.RUnlock()
+	r.aLock.Unlock()
 	return
 }
 

@@ -1,12 +1,16 @@
 package discovery
 
 import (
+	"fmt"
 	dc "github.com/memo012/tb-discovery/conf"
 	"github.com/memo012/tb-discovery/model"
-	"github.com/memo012/tb-discovery/registry"
+	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	"time"
-	. "github.com/smartystreets/goconvey/convey"
+)
+
+var (
+	fet    = &model.ArgFetch{AppID: "main.arch.test", Zone: "sh001", Env: "pre"}
 )
 
 var (
@@ -19,7 +23,7 @@ func defRegisArg() *model.ArgRegister {
 	return &model.ArgRegister{
 		AppID:           "main.arch.test",                // 服务唯一标识
 		Hostname:        "test1",                         // 主机名
-		Zone:            "tb001",                         // 机房服务标识
+		Zone:            "sh001",                         // 机房服务标识
 		Env:             "pre",                           // 环境
 		Metadata:        `{"test":"test","weight":"10"}`, // 扩展元数据
 		LatestTimestamp: time.Now().UnixNano(),           // 时间戳
@@ -43,12 +47,10 @@ func TestDiscovery_Register(t *testing.T) {
 		svr, cancel := New(config)
 		defer cancel()
 		i := model.NewInstance(reg)
-		type fields struct {
-			registry *registry.Registry
-		}
 		svr.Register(i, reg.LatestTimestamp)
 		// 拉取 instance
-		ins, err := svr.Fetch(nil)
+		ins, err := svr.Fetch(fet)
+		fmt.Println(ins)
 		So(err, ShouldBeNil)
 		So(len(ins.Instances), ShouldResemble, 1)
 	})

@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	log "github.com/go-kratos/kratos/pkg/log"
 	"github.com/memo012/tb-discovery/constant/errors"
 	"sync"
 	"time"
@@ -41,6 +42,7 @@ func NewInstance(arg *ArgRegister) (i *Instance) {
 		Zone:            arg.Zone,
 		Env:             arg.Env,
 		AppID:           arg.AppID,
+		HostName:        arg.Hostname,
 		RegTimestamp:    now,
 		UpTimestamp:     now,
 		LatestTimestamp: now,
@@ -92,8 +94,9 @@ func (a *App) NewInstance(ins *Instance, latestTime int64) (i *Instance, ok bool
 	// 更新时间戳
 	a.updateLatest(latestTime)
 	*i = *ins
+	a.lock.Unlock()
 	ok = !ok
-	return nil, false
+	return
 }
 
 func (p *Apps) NewApp(zone, appid string, lts int64) (a *App, new bool) {
@@ -124,9 +127,9 @@ func (p *Apps) InstanceInfo(zone string, latestTime int64) (ci *InstanceInfo, er
 	p.lock.Lock()
 	defer p.lock.Unlock()
 	// 看instance 是否被改动
-	if latestTime >= p.latestTimestamp {
-		return nil, errors.NotModified
-	}
+	//if latestTime >= p.latestTimestamp {
+	//	return nil, errors.NotModified
+	//}
 
 	// 说明instance 集合被改动过 拉取修改的instance  定义返回值
 
